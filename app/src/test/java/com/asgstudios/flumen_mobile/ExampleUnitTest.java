@@ -1,4 +1,4 @@
-package com.asgstudio.flumen_mobile;
+package com.asgstudios.flumen_mobile;
 
 import org.junit.Test;
 

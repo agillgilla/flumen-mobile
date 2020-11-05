@@ -1,4 +1,4 @@
-package com.asgstudio.flumen_mobile.ui.play;
+package com.asgstudios.flumen_mobile.ui.play;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.asgstudio.flumen_mobile.R;
+import com.asgstudios.flumen_mobile.R;
 
 public class PlayFragment extends Fragment {
 

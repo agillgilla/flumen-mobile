@@ -1,16 +1,16 @@
-package com.asgstudio.flumen_mobile.ui.play;
+package com.asgstudios.flumen_mobile.ui.notifications;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class PlayViewModel extends ViewModel {
+public class SettingsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public PlayViewModel() {
+    public SettingsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is play fragment");
+        mText.setValue("This is notifications fragment");
     }
 
     public LiveData<String> getText() {

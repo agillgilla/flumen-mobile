@@ -1,4 +1,4 @@
-package com.asgstudio.flumen_mobile;
+package com.asgstudios.flumen_mobile;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.asgstudio.flumen_mobile", appContext.getPackageName());
+        assertEquals("com.asgstudios.flumen_mobile", appContext.getPackageName());
     }
 }

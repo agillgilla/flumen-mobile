@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_sync">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.asgstudio.flumen_mobile.ui.sync.SyncFragment"
+        android:id="@+id/navigation_sync"
+        android:name="com.asgstudios.flumen_mobile.ui.sync.SyncFragment"
         android:label="@string/title_sync"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_sync" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.asgstudio.flumen_mobile.ui.play.PlayFragment"
+        android:id="@+id/navigation_play"
+        android:name="com.asgstudios.flumen_mobile.ui.play.PlayFragment"
         android:label="@string/title_play"
         tools:layout="@layout/fragment_play" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.asgstudio.flumen_mobile.ui.notifications.SettingsFragment"
+        android:id="@+id/navigation_settings"
+        android:name="com.asgstudios.flumen_mobile.ui.notifications.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>
