@@ -6,12 +6,86 @@
     android:layout_height="match_parent"
     tools:context=".ui.play.PlayFragment">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/colorPrimaryDark">
+
+        <Spinner
+            android:id="@+id/playlist_spinner"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:backgroundTint="#FFFFFF"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="201dp"
+        android:background="@color/colorPrimaryDark">
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/prevButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="8dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_media_previous"
+            app:layout_constraintEnd_toStartOf="@id/playButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="24dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_media_play"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/seekBar" />
+
+        <ImageButton
+            android:id="@+id/nextButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="30dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_media_next"
+            app:layout_constraintStart_toEndOf="@id/playButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

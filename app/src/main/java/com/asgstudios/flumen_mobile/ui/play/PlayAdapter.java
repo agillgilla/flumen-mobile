@@ -10,20 +10,26 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.asgstudios.flumen_mobile.MainActivity;
 import com.asgstudios.flumen_mobile.R;
+import com.asgstudios.flumen_mobile.ui.Player;
 
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder> {
 
+    private Player player;
     private Context context;
     private String[] songs;
     private String[] artists;
     private int[] songLengths;
+    private String[] songFiles;
 
-    public PlayAdapter(Context context, String[] songs, String[] artists, int[] songLengths) {
+    public PlayAdapter(Player player, Context context, String[] songs, String[] artists, int[] songLengths, String[] songFiles) {
+        this.player = player;
         this.context = context;
         this.songs = songs;
         this.artists = artists;
         this.songLengths = songLengths;
+        this.songFiles = songFiles;
     }
 
     @NonNull
@@ -36,10 +42,18 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PlayAdapter.PlayViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlayAdapter.PlayViewHolder holder, final int position) {
         holder.songTextView.setText(songs[position]);
         holder.artistTextView.setText(artists[position]);
         holder.songLengthTextView.setText(secondsToFormatted(songLengths[position]));
+
+        holder.playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrate(50);
+                player.playSong(songFiles[position]);
+            }
+        });
     }
 
     public static String secondsToFormatted(int seconds) {
@@ -70,8 +84,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
             this.artistTextView = itemView.findViewById(R.id.artistTextView);
             this.songLengthTextView = itemView.findViewById(R.id.lengthTextView);
 
-            this.playButton = itemView.findViewById(R.id.playButton);
-            this.queueButton = itemView.findViewById(R.id.queueButton);
+            this.playButton = itemView.findViewById(R.id.playRowButton);
+            this.queueButton = itemView.findViewById(R.id.queueRowButton);
         }
     }
 }
