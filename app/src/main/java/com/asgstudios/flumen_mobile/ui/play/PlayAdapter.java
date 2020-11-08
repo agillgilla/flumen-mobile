@@ -12,24 +12,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asgstudios.flumen_mobile.MainActivity;
 import com.asgstudios.flumen_mobile.R;
+import com.asgstudios.flumen_mobile.Song;
 import com.asgstudios.flumen_mobile.ui.Player;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder> {
 
     private Player player;
     private Context context;
-    private String[] songs;
-    private String[] artists;
-    private int[] songLengths;
-    private String[] songFiles;
+    private List<Song> songs;
 
-    public PlayAdapter(Player player, Context context, String[] songs, String[] artists, int[] songLengths, String[] songFiles) {
+    public PlayAdapter(Player player, Context context, List<Song> songs) {
         this.player = player;
         this.context = context;
         this.songs = songs;
-        this.artists = artists;
-        this.songLengths = songLengths;
-        this.songFiles = songFiles;
+
+        Collections.sort(songs, new Comparator<Song>() {
+            @Override
+            public int compare(Song lhs, Song rhs) {
+                return lhs.getName().compareTo(rhs.getName());
+            }
+        });
     }
 
     @NonNull
@@ -42,16 +48,17 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PlayAdapter.PlayViewHolder holder, final int position) {
-        holder.songTextView.setText(songs[position]);
-        holder.artistTextView.setText(artists[position]);
-        holder.songLengthTextView.setText(secondsToFormatted(songLengths[position]));
+    public void onBindViewHolder(@NonNull final PlayAdapter.PlayViewHolder holder, final int position) {
+        final Song song = songs.get(position);
+        holder.songTextView.setText(song.getName());
+        holder.artistTextView.setText(song.getArtist());
+        holder.songLengthTextView.setText(secondsToFormatted(song.getLength()));
 
         holder.playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MainActivity.vibrate(50);
-                player.playSong(songFiles[position]);
+                player.playPauseSong(song, holder);
             }
         });
     }
@@ -65,7 +72,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
 
     @Override
     public int getItemCount() {
-        return Math.min(songs.length, artists.length);
+        return songs.size();
     }
 
     public class PlayViewHolder extends RecyclerView.ViewHolder {
@@ -86,6 +93,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
 
             this.playButton = itemView.findViewById(R.id.playRowButton);
             this.queueButton = itemView.findViewById(R.id.queueRowButton);
+        }
+
+        public ImageButton getPlayButton() {
+            return this.playButton;
         }
     }
 }

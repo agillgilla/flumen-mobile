@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asgstudios.flumen_mobile.MainActivity;
 import com.asgstudios.flumen_mobile.R;
+import com.asgstudios.flumen_mobile.Song;
 import com.asgstudios.flumen_mobile.SyncWorker;
 import com.asgstudios.flumen_mobile.ui.Player;
 
@@ -32,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,22 +70,28 @@ public class PlayFragment extends Fragment {
             }
         });
 
-        this.mainActivity = (MainActivity) getParentFragment().getActivity();
-
-        this.player = new Player(mainActivity);
-
         ImageButton playButton = root.findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //player.playSong();
                 // TODO: Implement shuffle!
+
+                player.playPause();
             }
         });
 
         this.rootView = root;
 
         return root;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        this.mainActivity = (MainActivity) getParentFragment().getActivity();
+        this.player = Player.getOrInstantiate(mainActivity);
     }
 
     @Override
@@ -128,6 +136,9 @@ public class PlayFragment extends Fragment {
         this.playlists =  new ArrayList<>();
 
         File[] playlistDirs = musicDir.listFiles();
+        if (playlistDirs == null) {
+            return;
+        }
         for (File playlistDir : playlistDirs) {
             if (playlistDir.isDirectory()) {
                 this.playlists.add(playlistDir.getName());
@@ -166,7 +177,6 @@ public class PlayFragment extends Fragment {
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-
         updatePlaylist();
 
         playlistSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -193,20 +203,19 @@ public class PlayFragment extends Fragment {
 
             System.out.println(playlistArray);
             int playlistLength = playlistArray.length();
-            String[]songs = new String[playlistLength];
-            String[] artists = new String[playlistLength];
-            int[] songLengths = new int[playlistLength];
-            String[] songFiles = new String[playlistLength];
+
+            List<Song> songs = new ArrayList<>(playlistLength);
 
             for (int i = 0; i < playlistLength; i++) {
                 JSONObject playlistObj = playlistArray.getJSONObject(i);
-                songs[i] = playlistObj.getString("title");
-                artists[i] = playlistObj.getString("artist");
-                songLengths[i] = (int) Math.floor(playlistObj.getDouble("duration"));
-                songFiles[i] = playlistObj.getString("file");
+
+                songs.add(new Song(playlistObj.getString("title"),
+                        playlistObj.getString("artist"),
+                        (int) Math.floor(playlistObj.getDouble("duration")),
+                        playlistObj.getString("file")));
             }
 
-            this.playAdapter = new PlayAdapter(player, this.getContext(), songs, artists, songLengths, songFiles);
+            this.playAdapter = new PlayAdapter(player, this.getContext(), songs);
             recyclerView.setAdapter(playAdapter);
 
             //System.out.println(indexJson);

@@ -1,12 +1,21 @@
 package com.asgstudios.flumen_mobile;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -14,10 +23,14 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
     private static Vibrator VIBRATOR;
+
+    private static final String NOTIFICATION_CHANNEL = "flumen_media";
+    private NotificationManagerCompat notificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
         navView.setSelectedItemId(R.id.navigation_play);
 
 
+        notificationManager = NotificationManagerCompat.from(this);
+
+        //NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL, "Flumen Notification Channel", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        sendOnChannel();
     }
 
     public static void vibrate(int millis) {
@@ -46,5 +69,29 @@ public class MainActivity extends AppCompatActivity {
             // Deprecated in API 26
             VIBRATOR.vibrate(millis);
         }
+    }
+
+    public void sendOnChannel() {
+        //Bitmap icon = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.ic_launcher_foreground);
+
+        //Bitmap icon = ((VectorDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.ic_launcher_background, null));
+
+        Bitmap icon = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.ic_launcher_foreground);
+
+        Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
+                .setSmallIcon(R.drawable.flumen_large_plain)
+                .setContentTitle("Song Name")
+                .setContentText("Artist")
+                .setLargeIcon(icon)
+                .addAction(android.R.drawable.ic_media_previous, "Previous", null)
+                .addAction(android.R.drawable.ic_media_pause, "Pause", null)
+                .addAction(android.R.drawable.ic_media_next, "Next", null)
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().
+                        setShowActionsInCompactView(0, 1, 2))
+                .setSubText("Sub Text")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build();
+
+        notificationManager.notify(1, notification);
     }
 }
