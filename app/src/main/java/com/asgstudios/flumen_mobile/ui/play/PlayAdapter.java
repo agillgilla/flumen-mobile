@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.asgstudios.flumen_mobile.MainActivity;
 import com.asgstudios.flumen_mobile.R;
 import com.asgstudios.flumen_mobile.Song;
-import com.asgstudios.flumen_mobile.ui.Player;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,14 +20,17 @@ import java.util.List;
 
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder> {
 
-    private Player player;
+    private PlayViewModel playViewModel;
     private Context context;
     private List<Song> songs;
+    public int playingIndex;
+    public int pausedIndex;
 
-    public PlayAdapter(Player player, Context context, List<Song> songs) {
-        this.player = player;
+    public PlayAdapter(PlayViewModel playViewModel, Context context, List<Song> songs, int playingIndex) {
+        this.playViewModel = playViewModel;
         this.context = context;
         this.songs = songs;
+        this.playingIndex = playingIndex;
 
         Collections.sort(songs, new Comparator<Song>() {
             @Override
@@ -50,15 +52,42 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
     @Override
     public void onBindViewHolder(@NonNull final PlayAdapter.PlayViewHolder holder, final int position) {
         final Song song = songs.get(position);
-        holder.songTextView.setText(song.getName());
-        holder.artistTextView.setText(song.getArtist());
+        holder.rowSongTextView.setText(song.getName());
+        holder.rowArtistTextView.setText(song.getArtist());
         holder.songLengthTextView.setText(secondsToFormatted(song.getLength()));
+
+        if (position == playingIndex) {
+            holder.playButton.setImageResource(android.R.drawable.ic_media_pause);
+        } else {
+            holder.playButton.setImageResource(android.R.drawable.ic_media_play);
+        }
 
         holder.playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MainActivity.vibrate(50);
-                player.playPauseSong(song, holder);
+
+                if (playViewModel.playPauseSong(song, holder)) {
+                    playingIndex = position;
+                    playViewModel.setPlayingIndex(playingIndex);
+                }
+                /*
+                int prevPosition = playingIndex;
+                if (player.playPauseSong(song, holder)) {
+                    playingIndex = position;
+                } else {
+                    pausedIndex = playingIndex;
+                    playingIndex = -1;
+                }
+                */
+                //PlayAdapter.this.notifyItemChanged(position);
+
+                PlayAdapter.this.notifyDataSetChanged();
+                /*
+                if (prevPosition != -1) {
+                    PlayAdapter.this.notifyItemChanged(prevPosition);
+                }
+                */
             }
         });
     }
@@ -77,8 +106,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
 
     public class PlayViewHolder extends RecyclerView.ViewHolder {
 
-        TextView songTextView;
-        TextView artistTextView;
+        TextView rowSongTextView;
+        TextView rowArtistTextView;
         TextView songLengthTextView;
 
         ImageButton playButton;
@@ -87,8 +116,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
         public PlayViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.songTextView = itemView.findViewById(R.id.songTextView);
-            this.artistTextView = itemView.findViewById(R.id.artistTextView);
+            this.rowSongTextView = itemView.findViewById(R.id.rowSongTextView);
+            this.rowArtistTextView = itemView.findViewById(R.id.rowArtistTextView);
             this.songLengthTextView = itemView.findViewById(R.id.lengthTextView);
 
             this.playButton = itemView.findViewById(R.id.playRowButton);

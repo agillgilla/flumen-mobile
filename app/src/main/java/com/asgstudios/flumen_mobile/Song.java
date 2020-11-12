@@ -30,4 +30,18 @@ public class Song {
     public String getFilename() {
         return filename;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof Song) {
+            Song otherSong = (Song) other;
+
+            return this.filename.equals(otherSong.getFilename()) && this.length == otherSong.getLength();
+        }
+
+        return false;
+    }
 }

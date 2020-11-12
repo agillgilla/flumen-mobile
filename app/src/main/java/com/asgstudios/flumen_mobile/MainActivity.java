@@ -3,10 +3,11 @@ package com.asgstudios.flumen_mobile;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -15,29 +16,31 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static Vibrator VIBRATOR;
+    private static Vibrator vibrator;
+
+    private NotificationManagerCompat notificationManager;
+    private Notification mediaNotification;
+    private NotificationCompat.Builder mediaNotificationBuilder;
+
+    private PendingIntent playPauseIntent;
 
     private static final String NOTIFICATION_CHANNEL = "flumen_media";
-    private NotificationManagerCompat notificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        VIBRATOR = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -59,39 +62,81 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        sendOnChannel();
+        showMediaNotification();
     }
 
     public static void vibrate(int millis) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            VIBRATOR.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE));
+            vibrator.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             // Deprecated in API 26
-            VIBRATOR.vibrate(millis);
+            vibrator.vibrate(millis);
         }
     }
 
-    public void sendOnChannel() {
+    public void showMediaNotification() {
         //Bitmap icon = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.ic_launcher_foreground);
 
         //Bitmap icon = ((VectorDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.ic_launcher_background, null));
 
         Bitmap icon = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.ic_launcher_foreground);
 
-        Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
+        Intent playPauseIntentAction = new Intent(this, MediaActionReceiver.class);
+        playPauseIntentAction.putExtra("action","playPause");
+        playPauseIntent = PendingIntent.getBroadcast(this,1, playPauseIntentAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent nextIntentAction = new Intent(this, MediaActionReceiver.class);
+        nextIntentAction.putExtra("action","next");
+        PendingIntent nextIntent = PendingIntent.getBroadcast(this,2, nextIntentAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent prevIntentAction = new Intent(this, MediaActionReceiver.class);
+        prevIntentAction.putExtra("action","previous");
+        PendingIntent prevIntent = PendingIntent.getBroadcast(this,3, prevIntentAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+         mediaNotificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
                 .setSmallIcon(R.drawable.flumen_large_plain)
-                .setContentTitle("Song Name")
-                .setContentText("Artist")
+                .setContentTitle("")
+                .setContentText("")
                 .setLargeIcon(icon)
-                .addAction(android.R.drawable.ic_media_previous, "Previous", null)
-                .addAction(android.R.drawable.ic_media_pause, "Pause", null)
-                .addAction(android.R.drawable.ic_media_next, "Next", null)
+                .addAction(android.R.drawable.ic_media_previous, "Previous", prevIntent)
+                .addAction(android.R.drawable.ic_media_pause, "Pause", playPauseIntent)
+                .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().
                         setShowActionsInCompactView(0, 1, 2))
-                .setSubText("Sub Text")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .build();
+                .setSubText("")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
+                .setVibrate(new long[]{0L});
 
-        notificationManager.notify(1, notification);
+        mediaNotification = mediaNotificationBuilder.build();
+
+        notificationManager.notify(1, mediaNotification);
+
+        System.out.println("SHOWED NOTIFICATION!");
+    }
+
+    public void updateNotification(boolean isPlaying) {
+        if (isPlaying) {
+            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
+        } else {
+            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
+        }
+
+        notificationManager.notify(1, mediaNotification);
+    }
+
+    public void updateNotificationSong(Song song) {
+        mediaNotificationBuilder.setContentTitle(song.getName());
+        mediaNotificationBuilder.setContentText(song.getArtist());
+        mediaNotification = mediaNotificationBuilder.build();
+
+        notificationManager.notify(1, mediaNotification);
+    }
+
+    public void updateNotificationPlaylist(Playlist playlist) {
+        mediaNotificationBuilder.setSubText(playlist.getPlaylistName());
+        mediaNotification = mediaNotificationBuilder.build();
+
+        notificationManager.notify(1, mediaNotification);
     }
 }

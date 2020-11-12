@@ -22,28 +22,31 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/songTextView"
+                android:id="@+id/rowSongTextView"
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
                 android:maxLines="2"
+                android:ellipsize="end"
                 android:text="TextView"
                 android:textSize="22sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/artistTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/rowArtistTextView"
+                android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="4dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="TextView"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/songTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/rowSongTextView" />
 
             <TextView
                 android:id="@+id/lengthTextView"
