@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.asgstudios.flumen_mobile.SyncWorker.JSON_INDEX_FILENAME;
@@ -21,7 +23,7 @@ public class PlaylistManager {
     private File filesDir;
     private JSONObject indexJson;
 
-    List<Playlist> playlists;
+    private List<Playlist> playlists;
 
     public PlaylistManager(File filesDir) {
         this.filesDir = filesDir;
@@ -31,7 +33,7 @@ public class PlaylistManager {
         //File filesDir = mainActivity.getExternalFilesDir(null);
         File musicDir = new File(filesDir, SyncWorker.MUSIC_DIR);
 
-        this.playlists =  new ArrayList<>();
+        this.playlists = new ArrayList<>();
 
         File[] playlistDirs = musicDir.listFiles();
         if (playlistDirs == null) {
@@ -70,7 +72,15 @@ public class PlaylistManager {
         return this.playlists;
     }
 
-    public List<Song> getPlaylistSongs(Playlist playlist) {
+    public List<Playlist> getPlaylists() {
+        if (playlists == null) {
+            loadPlaylistList();
+        }
+
+        return this.playlists;
+    }
+
+    public List<Song> getPlaylistSongs(Playlist playlist, boolean sorted) {
         try {
             JSONArray playlistArray = indexJson.getJSONArray(playlist.getPlaylistName());
 
@@ -86,6 +96,15 @@ public class PlaylistManager {
                         playlistObj.getString("artist"),
                         (int) Math.floor(playlistObj.getDouble("duration")),
                         playlistObj.getString("file")));
+            }
+
+            if (sorted) {
+                Collections.sort(songs, new Comparator<Song>() {
+                    @Override
+                    public int compare(Song lhs, Song rhs) {
+                        return lhs.getName().compareTo(rhs.getName());
+                    }
+                });
             }
 
             return songs;

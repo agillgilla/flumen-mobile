@@ -14,8 +14,6 @@ import com.asgstudios.flumen_mobile.MainActivity;
 import com.asgstudios.flumen_mobile.R;
 import com.asgstudios.flumen_mobile.Song;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder> {
@@ -31,13 +29,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
         this.context = context;
         this.songs = songs;
         this.playingIndex = playingIndex;
-
-        Collections.sort(songs, new Comparator<Song>() {
-            @Override
-            public int compare(Song lhs, Song rhs) {
-                return lhs.getName().compareTo(rhs.getName());
-            }
-        });
     }
 
     @NonNull
@@ -67,7 +58,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
             public void onClick(View view) {
                 MainActivity.vibrate(50);
 
-                if (playViewModel.playPauseSong(song, holder)) {
+                if (playViewModel.playPauseSong(song)) {
                     playingIndex = position;
                     playViewModel.setPlayingIndex(playingIndex);
                 }
@@ -88,6 +79,15 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
                     PlayAdapter.this.notifyItemChanged(prevPosition);
                 }
                 */
+            }
+        });
+
+        holder.queueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrateDouble(25);
+
+                playViewModel.pushSongIndexToQueue(position);
             }
         });
     }

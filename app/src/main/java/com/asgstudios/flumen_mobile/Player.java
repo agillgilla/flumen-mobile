@@ -5,9 +5,7 @@ import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
-import android.widget.ImageButton;
 
-import com.asgstudios.flumen_mobile.ui.play.PlayAdapter;
 import com.asgstudios.flumen_mobile.ui.play.PlayViewModel;
 
 import java.io.File;
@@ -27,7 +25,6 @@ public class Player {
     private boolean isSongLoaded = false;
 
     private Song currentSong;
-    private PlayAdapter.PlayViewHolder currentSongViewHolder;
 
     private Handler updateTimeHandler;
     private Runnable updateTimeTask;
@@ -56,19 +53,21 @@ public class Player {
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .build()
         );
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                viewModel.nextSong();
+            }
+        });
     }
 
-    public boolean playNewSong(Song song, PlayAdapter.PlayViewHolder songViewHolder) {
-        if (currentSong != null) {
-            ImageButton viewHolderPlayButton = currentSongViewHolder.getPlayButton();
-            viewHolderPlayButton.setImageResource(android.R.drawable.ic_media_play);
-        }
+    public boolean playNewSong(Song song) {
 
         File filesDir = application.getExternalFilesDir(null);
         File musicDir = new File(filesDir, SyncWorker.MUSIC_DIR);
 
         this.currentSong = song;
-        this.currentSongViewHolder = songViewHolder;
 
         Uri musicUri = Uri.fromFile(new File(new File(musicDir, playlist.getPlaylistName()), song.getFilename()));
 
@@ -84,27 +83,16 @@ public class Player {
             mediaPlayer.start();
 
             updateTimeHandler = new Handler();
-            /*
-            mainActivity.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (mediaPlayer != null){
-                        int mCurrentPosition = mediaPlayer.getCurrentPosition() / 100;
-                        seekBar.setProgress(mCurrentPosition);
-                    }
-                    handler.postDelayed(this, 100);
-                }
-            });
-            */
 
             updateTimeTask = new Runnable() {
                 public void run() {
-                    long totalDuration = mediaPlayer.getDuration();
-                    long currentDuration = mediaPlayer.getCurrentPosition();
+                    if (mediaPlayer.isPlaying()) {
+                        long totalDuration = mediaPlayer.getDuration();
+                        long currentDuration = mediaPlayer.getCurrentPosition();
 
-                    viewModel.setCurrSongTime(currentDuration);
-                    viewModel.setCurrSongDuration(totalDuration);
+                        viewModel.setCurrSongTime(currentDuration);
+                        viewModel.setCurrSongDuration(totalDuration);
+                    }
 
                     // Running this thread after 100 milliseconds
                     updateTimeHandler.postDelayed(this, 100);
@@ -112,15 +100,7 @@ public class Player {
             };
             updateTimeHandler.postDelayed(updateTimeTask, 100);
 
-            //mainActivity.runOnUiThread(updateTimeTask);
-
             viewModel.setCurrSong(song);
-
-
-            //mainActivity.updateNotificationSong(song);
-
-            //ImageButton viewHolderPlayButton = currentSongViewHolder.getPlayButton();
-            //viewHolderPlayButton.setImageResource(android.R.drawable.ic_media_pause);
 
             return true;
         } catch (IOException ioe) {
@@ -169,6 +149,13 @@ public class Player {
         }
     }
 
+    public void restartSong() {
+        this.mediaPlayer.seekTo(0);
+        if (!mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+        }
+    }
+
     public void beginSeek() {
         updateTimeHandler.removeCallbacks(updateTimeTask);
     }
@@ -189,6 +176,10 @@ public class Player {
         return this.mediaPlayer.isPlaying();
     }
 
+    public boolean isSongLoaded() {
+        return this.isSongLoaded;
+    }
+
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
     }
@@ -203,5 +194,9 @@ public class Player {
 
     public PlayViewModel getViewModel() {
         return this.viewModel;
+    }
+
+    public int getCurrTimeMillis() {
+        return this.mediaPlayer.getCurrentPosition();
     }
 }

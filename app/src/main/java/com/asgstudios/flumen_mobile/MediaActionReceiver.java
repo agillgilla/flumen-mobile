@@ -4,6 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.lifecycle.ViewModelProvider;
+
+import com.asgstudios.flumen_mobile.ui.play.PlayViewModel;
+
 public class MediaActionReceiver extends BroadcastReceiver {
 
     @Override
@@ -25,12 +29,10 @@ public class MediaActionReceiver extends BroadcastReceiver {
     }
 
     public void next() {
-        System.out.println("NEXT SONG!");
-        //Player.getInstance().next();
+        Player.getInstance().getViewModel().nextSong();
     }
 
     public void previous() {
-        System.out.println("PREVIOUS SONG!");
-        //Player.getInstance().previous();
+        Player.getInstance().getViewModel().previousSong();
     }
 }

@@ -1,5 +1,6 @@
 package com.asgstudios.flumen_mobile.ui.play;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +13,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,9 +48,7 @@ public class PlayFragment extends Fragment {
         setRetainInstance(true);
 
         //playViewModel = ViewModelProviders.of(this).get(PlayViewModel.class);
-        System.out.println("Before assigning ViewModel");
         playViewModel = new ViewModelProvider(mainActivity, ViewModelProvider.AndroidViewModelFactory.getInstance(mainActivity.getApplication())).get(PlayViewModel.class);
-        System.out.println("After assigning ViewModel");
 
         //View root = inflater.inflate(R.layout.fragment_play, container, false);
 
@@ -87,13 +83,14 @@ public class PlayFragment extends Fragment {
             }
         });
 
-        playViewModel.getCurrSong().observe(getViewLifecycleOwner(), new Observer<Song>() {
+        final TextView playingSongTextView = rootView.findViewById(R.id.playingSongTextView);
+        final TextView playingArtistTextView = rootView.findViewById(R.id.playingArtistTextView);
+        // We observe forever because otherwise the notification wouldn't update when the app has lost focus
+        playViewModel.getCurrSong().observeForever(new Observer<Song>() {
             @Override
             public void onChanged(Song currSong) {
-                TextView playingSongTextView = mainActivity.findViewById(R.id.playingSongTextView);
-                playingSongTextView.setText(currSong.getName());
 
-                TextView playingArtistTextView = mainActivity.findViewById(R.id.playingArtistTextView);
+                playingSongTextView.setText(currSong.getName());
                 playingArtistTextView.setText(currSong.getArtist());
 
                 mainActivity.updateNotificationSong(currSong);
@@ -181,7 +178,7 @@ public class PlayFragment extends Fragment {
 
                 playViewModel.playPause();
 
-                mainActivity.updateNotification(playViewModel.getIsPlaying().getValue());
+                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
                 /*
                 if (player.playPause()) {
                     if (playAdapter.playingIndex == -1 && playAdapter.pausedIndex != -1) {
@@ -198,18 +195,71 @@ public class PlayFragment extends Fragment {
             }
         });
 
-        playViewModel.getIsPlaying().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        final ImageButton nextButton = rootView.findViewById(R.id.nextButton);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrate(50);
+
+                playViewModel.nextSong();
+
+                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+            }
+        });
+
+        final ImageButton prevButton = rootView.findViewById(R.id.prevButton);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrate(50);
+
+                playViewModel.previousSong();
+
+                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+            }
+        });
+
+        final ImageButton loopButton = rootView.findViewById(R.id.loopButton);
+        loopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrate(25);
+                playViewModel.setPlayMode(PlayViewModel.PlayMode.LOOP);
+            }
+        });
+
+        final ImageButton shuffleButton = rootView.findViewById(R.id.shuffleButton);
+        shuffleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.vibrate(25);
+                playViewModel.setPlayMode(PlayViewModel.PlayMode.SHUFFLE);
+            }
+        });
+
+        playViewModel.getPlayMode().observe(getViewLifecycleOwner(), new Observer<PlayViewModel.PlayMode>() {
+            @Override
+            public void onChanged(PlayViewModel.PlayMode playMode) {
+                if (playMode == PlayViewModel.PlayMode.LOOP) {
+                    loopButton.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                    shuffleButton.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+                } else if (playMode == PlayViewModel.PlayMode.SHUFFLE) {
+                    shuffleButton.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                    loopButton.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+                }
+            }
+        });
+
+        // We observe forever because otherwise the notification wouldn't update when the app has lost focus
+        playViewModel.getIsPlaying().observeForever(new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isPlaying) {
                 if (isPlaying) {
-                    playButton.setImageResource(android.R.drawable.ic_media_pause);
-
-                    mainActivity.updateNotification(isPlaying);
+                    playButton.setImageResource(R.drawable.ic_pause_24dp);
                 } else {
-                    playButton.setImageResource(android.R.drawable.ic_media_play);
-
-                    mainActivity.updateNotification(isPlaying);
+                    playButton.setImageResource(R.drawable.ic_play_24dp);
                 }
+                mainActivity.updateNotificationPlaying(isPlaying);
             }
         });
 

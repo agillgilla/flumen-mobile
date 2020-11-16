@@ -5,17 +5,26 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.asgstudios.flumen_mobile.PlayQueue;
+import com.asgstudios.flumen_mobile.PlayShuffleQueue;
 import com.asgstudios.flumen_mobile.PlaybackInfo;
 import com.asgstudios.flumen_mobile.Playlist;
 import com.asgstudios.flumen_mobile.PlaylistManager;
 import com.asgstudios.flumen_mobile.Song;
 import com.asgstudios.flumen_mobile.Player;
+import com.asgstudios.flumen_mobile.SongAndIndex;
 
 import java.util.List;
 
 public class PlayViewModel extends AndroidViewModel {
 
+    public enum PlayMode { LOOP, SHUFFLE }
+
     private Player player;
+
+    private PlayShuffleQueue playShuffleQueue;
+
+    private PlayQueue playQueue;
 
     private PlaylistManager playlistManager;
 
@@ -30,8 +39,9 @@ public class PlayViewModel extends AndroidViewModel {
     private MutableLiveData<String> currSongDuration;
 
     private MutableLiveData<Song> currSong;
-
     private MutableLiveData<Playlist> currPlaylist;
+
+    private MutableLiveData<PlayMode> playMode;
 
     private MutableLiveData<List<Playlist>> playlists;
 
@@ -40,18 +50,16 @@ public class PlayViewModel extends AndroidViewModel {
     public PlayViewModel(Application application) {
         super(application);
 
-        System.out.println("PlayViewModel created!");
-
         this.player = Player.getOrInstantiate(getApplication());
         this.player.setViewModel(this);
 
         this.playlistManager = new PlaylistManager(getApplication().getExternalFilesDir(null));
 
         this.playlists = new MutableLiveData<>();
-        this.playlists.setValue(playlistManager.loadPlaylistList());
+        this.playlists.setValue(playlistManager.getPlaylists());
 
         this.songs = new MutableLiveData<>();
-        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(0)));
+        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(0), true));
 
         this.playingIndex = new MutableLiveData<>();
         this.playingIndex.setValue(-1);
@@ -73,9 +81,22 @@ public class PlayViewModel extends AndroidViewModel {
 
         this.currPlaylist = new MutableLiveData<>();
         this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(0));
+
+        this.playMode = new MutableLiveData<>();
+        this.playMode.setValue(PlayMode.SHUFFLE);
+
+        this.playShuffleQueue = PlayShuffleQueue.getOrInstantiate(playlistManager);
+
+        this.playQueue = PlayQueue.getOrInstantiate();
     }
 
     public boolean playPause() {
+        if (!this.player.isSongLoaded()) {
+            this.nextSong();
+
+            return true;
+        }
+
         boolean isPlaying = this.player.playPause();
 
         this.isPlaying.setValue(isPlaying);
@@ -97,15 +118,19 @@ public class PlayViewModel extends AndroidViewModel {
         return isPlaying;
     }
 
-    public boolean playPauseSong(Song song, PlayAdapter.PlayViewHolder holder) {
+    public boolean playPauseSong(Song song) {
         if (song.equals(currSong.getValue())) {
             return this.playPause();
         }
 
+        playNewSong(song);
+        return true;
+    }
+
+    public void playNewSong(Song song) {
         this.player.setPlaylist(currPlaylist.getValue());
-        boolean isPlaying = this.player.playNewSong(song, holder);
+        boolean isPlaying = this.player.playNewSong(song);
         this.isPlaying.setValue(isPlaying);
-        return isPlaying;
     }
 
     public void beginSeek() {
@@ -114,6 +139,45 @@ public class PlayViewModel extends AndroidViewModel {
 
     public void finalizeSeek(int progress) {
         player.finalizeSeek(progress);
+    }
+
+    public void nextSong() {
+        if (this.getPlayMode().getValue() == PlayMode.LOOP) {
+            this.player.restartSong();
+        } else if (this.getPlayMode().getValue() == PlayMode.SHUFFLE) {
+            if (!playQueue.isEmpty()) {
+                SongAndIndex nextSongAndIndex = playQueue.pop();
+
+                playAdapter.playingIndex = nextSongAndIndex.getIndex();
+                this.setPlayingIndex(playAdapter.playingIndex);
+                playAdapter.notifyDataSetChanged();
+
+                this.playNewSong(nextSongAndIndex.getSong());
+            } else {
+                playAdapter.playingIndex = playShuffleQueue.peekNextSongIndex();
+                this.setPlayingIndex(playAdapter.playingIndex);
+                playAdapter.notifyDataSetChanged();
+
+                this.playNewSong(playShuffleQueue.nextSong());
+            }
+        }
+    }
+
+    public void previousSong() {
+        if (player.getCurrTimeMillis() > 5000) {
+            player.restartSong();
+            return;
+        }
+
+        playAdapter.playingIndex = playShuffleQueue.peekPreviousSongIndex();
+        this.setPlayingIndex(playAdapter.playingIndex);
+        playAdapter.notifyDataSetChanged();
+
+        this.playPauseSong(playShuffleQueue.previousSong());
+    }
+
+    public void pushSongIndexToQueue(int songIndex) {
+        playQueue.push(songs.getValue().get(songIndex), songIndex);
     }
 
     public static String secondsToFormatted(int seconds) {
@@ -158,8 +222,9 @@ public class PlayViewModel extends AndroidViewModel {
     }
 
     public void setCurrPlaylist(Playlist currPlaylist) {
-        this.songs.setValue(playlistManager.getPlaylistSongs(currPlaylist));
+        this.songs.setValue(playlistManager.getPlaylistSongs(currPlaylist, true));
         this.currPlaylist.setValue(currPlaylist);
+        this.playShuffleQueue.setActivePlaylist(currPlaylist);
 
         if (player.getPlaylist() != null &&
                 currPlaylist.getPlaylistName().equals(player.getPlaylist().getPlaylistName())) {
@@ -169,8 +234,7 @@ public class PlayViewModel extends AndroidViewModel {
     }
 
     public void setPlaylistIndex(int playlistIndex) {
-        this.currPlaylist.setValue(playlists.getValue().get(playlistIndex));
-        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(playlistIndex)));
+        setCurrPlaylist(playlists.getValue().get(playlistIndex));
     }
 
     public Playlist getPlayingPlaylist() {
@@ -203,6 +267,14 @@ public class PlayViewModel extends AndroidViewModel {
 
     public MutableLiveData<PlaybackInfo> getCurrSongPlaybackInfo() {
         return currSongPlaybackInfo;
+    }
+
+    public void setPlayMode(PlayMode playMode) {
+        this.playMode.setValue(playMode);
+    }
+
+    public MutableLiveData<PlayMode> getPlayMode() {
+        return playMode;
     }
 
     public void setPlayAdapter(PlayAdapter playAdapter) {

@@ -74,6 +74,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static void vibrateDouble(int millis) {
+        long[] vibrationPattern = new long[4];
+        for (int i = 0; i < 4; i++) {
+            vibrationPattern[i] = millis * i;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern, -1));
+        } else {
+            // Deprecated in API 26
+            vibrator.vibrate(vibrationPattern, -1);
+        }
+    }
+
     public void showMediaNotification() {
         //Bitmap icon = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.ic_launcher_foreground);
 
@@ -110,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
         mediaNotification = mediaNotificationBuilder.build();
 
-        notificationManager.notify(1, mediaNotification);
+        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
 
-        System.out.println("SHOWED NOTIFICATION!");
+        notificationManager.notify(1, mediaNotification);
     }
 
-    public void updateNotification(boolean isPlaying) {
+    public void updateNotificationPlaying(boolean isPlaying) {
         if (isPlaying) {
             mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
         } else {
@@ -130,12 +144,16 @@ public class MainActivity extends AppCompatActivity {
         mediaNotificationBuilder.setContentText(song.getArtist());
         mediaNotification = mediaNotificationBuilder.build();
 
+        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
+
         notificationManager.notify(1, mediaNotification);
     }
 
     public void updateNotificationPlaylist(Playlist playlist) {
         mediaNotificationBuilder.setSubText(playlist.getPlaylistName());
         mediaNotification = mediaNotificationBuilder.build();
+
+        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
 
         notificationManager.notify(1, mediaNotification);
     }
