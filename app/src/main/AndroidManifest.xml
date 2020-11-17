@@ -19,10 +19,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
         <receiver android:name=".MediaActionReceiver" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
 
 </manifest>

@@ -62,6 +62,25 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
+        /*
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification =
+                new NotificationCompat.Builder(this, NotifierService.ANDROID_CHANNEL_ID)
+                        .setContentTitle("LocationNotifier")
+                        .setContentText("LocationNotifier is running.")
+                        .setSmallIcon(android.R.drawable.stat_notify_more)
+                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().
+                                setShowActionsInCompactView(0, 1, 2))
+                        .setContentIntent(pendingIntent)
+                        .setTicker("LocationNotifier ticker")
+                        .build();
+
+        startForegroundService(ONGOING_NOTIFICATION_ID, notification);
+        */
+
         showMediaNotification();
     }
 
@@ -118,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().
                         setShowActionsInCompactView(0, 1, 2))
                 .setSubText("")
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setVibrate(new long[]{0L});
 
@@ -126,7 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
         mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
 
-        notificationManager.notify(1, mediaNotification);
+        //notificationManager.notify(1, mediaNotification);
+
+        Intent startIntent = new Intent(this, NotificationService.class);
+        startIntent.setAction(NotificationService.START_ACTION);
+        startService(startIntent);
     }
 
     public void updateNotificationPlaying(boolean isPlaying) {
@@ -136,7 +159,12 @@ public class MainActivity extends AppCompatActivity {
             mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
         }
 
-        notificationManager.notify(1, mediaNotification);
+        Intent updateIntent = new Intent(this, NotificationService.class);
+        updateIntent.setAction(NotificationService.UPDATE_PLAYING_ACTION);
+        updateIntent.putExtra("playing", isPlaying);
+        startService(updateIntent);
+
+        //notificationManager.notify(1, mediaNotification);
     }
 
     public void updateNotificationSong(Song song) {
@@ -146,7 +174,13 @@ public class MainActivity extends AppCompatActivity {
 
         mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
 
-        notificationManager.notify(1, mediaNotification);
+        Intent updateIntent = new Intent(this, NotificationService.class);
+        updateIntent.setAction(NotificationService.UPDATE_SONG_ACTION);
+        updateIntent.putExtra("name", song.getName());
+        updateIntent.putExtra("artist", song.getArtist());
+        startService(updateIntent);
+
+        //notificationManager.notify(1, mediaNotification);
     }
 
     public void updateNotificationPlaylist(Playlist playlist) {
@@ -155,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
         mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
 
-        notificationManager.notify(1, mediaNotification);
+        Intent updateIntent = new Intent(this, NotificationService.class);
+        updateIntent.setAction(NotificationService.UPDATE_PLAYLIST_ACTION);
+        updateIntent.putExtra("playlist", playlist.getPlaylistName());
+        startService(updateIntent);
+
+        //notificationManager.notify(1, mediaNotification);
     }
 }
