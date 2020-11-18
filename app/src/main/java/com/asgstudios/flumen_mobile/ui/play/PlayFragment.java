@@ -158,7 +158,7 @@ public class PlayFragment extends Fragment {
                     return;
                 }
 
-                System.out.println("Setting playlist index from spinner: " + playlistSpinner.getSelectedItemPosition());
+                //System.out.println("Setting playlist index from spinner: " + playlistSpinner.getSelectedItemPosition());
                 playViewModel.setPlaylistIndex(playlistSpinner.getSelectedItemPosition());
             }
 
@@ -171,27 +171,11 @@ public class PlayFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //player.playSong();
-                // TODO: Implement shuffle!
-
                 MainActivity.vibrate(50);
 
                 playViewModel.playPause();
 
                 mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
-                /*
-                if (player.playPause()) {
-                    if (playAdapter.playingIndex == -1 && playAdapter.pausedIndex != -1) {
-                        playAdapter.playingIndex = playAdapter.pausedIndex;
-                        playAdapter.pausedIndex = -1;
-                        playAdapter.notifyItemChanged(playAdapter.playingIndex);
-                    }
-                } else {
-                    playAdapter.pausedIndex = playAdapter.playingIndex;
-                    playAdapter.playingIndex = -1;
-                    playAdapter.notifyItemChanged(playAdapter.pausedIndex);
-                }
-                */
             }
         });
 

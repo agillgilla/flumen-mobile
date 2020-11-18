@@ -17,6 +17,7 @@ public class Player {
 
     private Application application;
     private PlayViewModel viewModel;
+    private Preferences preferences;
 
     private MediaPlayer mediaPlayer;
 
@@ -45,6 +46,8 @@ public class Player {
 
     private Player(Application application) {
         this.application = application;
+
+        this.preferences = Preferences.getInstance();
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioAttributes(
@@ -182,6 +185,7 @@ public class Player {
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
+        this.preferences.setLastPlaylistIndex(playlist.getPlaylistIndex());
     }
 
     public Playlist getPlaylist() {

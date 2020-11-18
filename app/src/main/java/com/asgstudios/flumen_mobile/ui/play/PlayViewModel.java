@@ -10,6 +10,7 @@ import com.asgstudios.flumen_mobile.PlayShuffleQueue;
 import com.asgstudios.flumen_mobile.PlaybackInfo;
 import com.asgstudios.flumen_mobile.Playlist;
 import com.asgstudios.flumen_mobile.PlaylistManager;
+import com.asgstudios.flumen_mobile.Preferences;
 import com.asgstudios.flumen_mobile.Song;
 import com.asgstudios.flumen_mobile.Player;
 import com.asgstudios.flumen_mobile.SongAndIndex;
@@ -58,8 +59,11 @@ public class PlayViewModel extends AndroidViewModel {
         this.playlists = new MutableLiveData<>();
         this.playlists.setValue(playlistManager.getPlaylists());
 
+        Preferences preferences = Preferences.getInstance();
+        int lastPlaylistIndex = preferences.getLastPlaylistIndex();
+
         this.songs = new MutableLiveData<>();
-        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(0), true));
+        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(lastPlaylistIndex), true));
 
         this.playingIndex = new MutableLiveData<>();
         this.playingIndex.setValue(-1);
@@ -80,7 +84,7 @@ public class PlayViewModel extends AndroidViewModel {
         this.currSong.setValue(new Song("", "", 0, ""));
 
         this.currPlaylist = new MutableLiveData<>();
-        this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(0));
+        this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(lastPlaylistIndex));
 
         this.playMode = new MutableLiveData<>();
         this.playMode.setValue(PlayMode.SHUFFLE);

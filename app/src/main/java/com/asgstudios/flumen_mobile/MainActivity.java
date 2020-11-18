@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -65,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL, "Flumen Notification Channel", NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(notificationChannel);
         }
+
+        SharedPreferences preferences = this.getPreferences(Context.MODE_PRIVATE);
+
+        Preferences.getOrInstantiate(preferences);
 
         /*
         Intent notificationIntent = new Intent(this, MainActivity.class);
