@@ -90,6 +90,18 @@ public class PlayViewModel extends AndroidViewModel {
         this.playQueue = PlayQueue.getOrInstantiate();
     }
 
+    public void playIfNotAlready() {
+        if (!this.isPlaying.getValue()) {
+            this.playPause();
+        }
+    }
+
+    public void pauseIfNotAlready() {
+        if (this.player.isSongLoaded() && this.isPlaying.getValue()) {
+            this.playPause();
+        }
+    }
+
     public boolean playPause() {
         if (!this.player.isSongLoaded()) {
             this.nextSong();

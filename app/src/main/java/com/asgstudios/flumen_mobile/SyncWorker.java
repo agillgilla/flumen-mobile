@@ -41,10 +41,12 @@ public class SyncWorker implements Runnable {
 
     private MainActivity mainActivity;
     private Handler statusHandler;
+    private Handler progressHandler;
 
-    public SyncWorker(MainActivity mainActivity, Handler statusHandler) {
+    public SyncWorker(MainActivity mainActivity, Handler statusHandler, Handler progressHandler) {
         this.mainActivity = mainActivity;
         this.statusHandler = statusHandler;
+        this.progressHandler = progressHandler;
     }
 
     private static String readStringFromInputStream(InputStream inputStream) {
@@ -160,6 +162,13 @@ public class SyncWorker implements Runnable {
                             songOutputStream.close();
                         }
 
+                        Message progressMsg = statusHandler.obtainMessage();
+                        Bundle progressBundle = new Bundle();
+                        progressBundle.putInt("currSong", i + 1);
+                        progressBundle.putInt("numSongs", songListJsonArray.length());
+                        progressMsg.setData(progressBundle);
+                        progressHandler.dispatchMessage(msg);
+
                         /*
                         Mp3File mp3file = null;
                         try {
@@ -180,10 +189,11 @@ public class SyncWorker implements Runnable {
                             System.out.println("Length: " + mp3file.getLengthInSeconds());
                         }
                         */
-                        index.put(playlistName, songListJsonArray);
 
                         //System.out.println("DURATION: " + songFileObj.getDouble("duration"));
                     }
+
+                    index.put(playlistName, songListJsonArray);
 
 
                 }

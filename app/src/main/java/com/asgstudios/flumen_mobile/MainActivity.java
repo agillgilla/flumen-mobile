@@ -4,8 +4,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private PendingIntent playPauseIntent;
 
     private static final String NOTIFICATION_CHANNEL = "flumen_media";
+
+    private BluetoothReceiver bluetoothReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         */
 
         showMediaNotification();
+
+        registerBluetoothReceiver();
     }
 
     public static void vibrate(int millis) {
@@ -105,6 +111,16 @@ public class MainActivity extends AppCompatActivity {
             // Deprecated in API 26
             vibrator.vibrate(vibrationPattern, -1);
         }
+    }
+
+    public void registerBluetoothReceiver() {
+        bluetoothReceiver = new BluetoothReceiver();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(bluetoothReceiver, filter);
     }
 
     public void showMediaNotification() {

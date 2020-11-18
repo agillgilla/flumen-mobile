@@ -3,11 +3,13 @@ package com.asgstudios.flumen_mobile;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class SyncManager {
     private MainActivity mainActivity;
     private Handler statusHandler;
+    private Handler progressHandler;
     private SyncWorker syncWorker;
 
     public SyncManager(MainActivity mainActivity) {
@@ -30,7 +32,26 @@ public class SyncManager {
                 });
             }
         };
-        this.syncWorker = new SyncWorker(mainActivity, statusHandler);
+
+        this.progressHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle bundle = msg.getData();
+                final int currSong = bundle.getInt("currSong");
+                final int numSongs = bundle.getInt("numSongs");
+                final ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
+                activity.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        progressBar.setMax(numSongs);
+                        progressBar.setProgress(currSong);
+                    }
+                });
+            }
+        };
+
+        this.syncWorker = new SyncWorker(mainActivity, statusHandler, progressHandler);
 
         System.out.println("FILES PATH: " + mainActivity.getFilesDir().getAbsolutePath());
         System.out.println("ALTERNATE PATH: " + mainActivity.getExternalFilesDir(null));
