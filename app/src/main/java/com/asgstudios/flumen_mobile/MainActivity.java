@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        filter.addAction(Intent.ACTION_MEDIA_BUTTON);
         this.registerReceiver(bluetoothReceiver, filter);
     }
 
