@@ -5,12 +5,14 @@ public class Song {
 
     private String name;
     private String artist;
+    private String album;
     private int length;
     private String filename;
 
-    public Song(String name, String artist, int length, String filename) {
+    public Song(String name, String artist, String album, int length, String filename) {
         this.name = name;
         this.artist = artist;
+        this.album = album;
         this.length = length;
         this.filename = filename;
     }
@@ -21,6 +23,10 @@ public class Song {
 
     public String getArtist() {
         return artist;
+    }
+
+    public String getAlbum() {
+        return album;
     }
 
     public int getLength() {

@@ -94,6 +94,7 @@ public class PlaylistManager {
 
                 songs.add(new Song(playlistObj.getString("title"),
                         playlistObj.getString("artist"),
+                        playlistObj.getString("album"),
                         (int) Math.floor(playlistObj.getDouble("duration")),
                         playlistObj.getString("file")));
             }

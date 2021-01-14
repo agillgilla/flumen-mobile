@@ -94,10 +94,12 @@ public class PlayFragment extends Fragment {
                 playingArtistTextView.setText(currSong.getArtist());
 
                 mainActivity.updateNotificationSong(currSong);
-
+                
                 if (playViewModel.getCurrPlaylist().getValue() != null) {
                     mainActivity.updateNotificationPlaylist(playViewModel.getCurrPlaylist().getValue());
                 }
+
+                mainActivity.updateSongBluetooth(currSong, playViewModel.getIsPlaying().getValue());
             }
         });
 
@@ -176,6 +178,8 @@ public class PlayFragment extends Fragment {
                 playViewModel.playPause();
 
                 mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+
+                mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
         });
 
@@ -188,6 +192,8 @@ public class PlayFragment extends Fragment {
                 playViewModel.nextSong();
 
                 mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+
+                mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
         });
 
@@ -200,6 +206,8 @@ public class PlayFragment extends Fragment {
                 playViewModel.previousSong();
 
                 mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+
+                mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
         });
 
@@ -244,6 +252,8 @@ public class PlayFragment extends Fragment {
                     playButton.setImageResource(R.drawable.ic_play_24dp);
                 }
                 mainActivity.updateNotificationPlaying(isPlaying);
+
+                mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
         });
 

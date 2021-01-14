@@ -81,7 +81,7 @@ public class PlayViewModel extends AndroidViewModel {
         this.currSongDuration.setValue(secondsToFormatted(0));
 
         this.currSong = new MutableLiveData<>();
-        this.currSong.setValue(new Song("", "", 0, ""));
+        this.currSong.setValue(new Song("", "", "", 0, ""));
 
         this.currPlaylist = new MutableLiveData<>();
         this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(lastPlaylistIndex));

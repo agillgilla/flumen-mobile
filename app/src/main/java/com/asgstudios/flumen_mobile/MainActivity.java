@@ -26,6 +26,9 @@ import androidx.navigation.ui.NavigationUI;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class MainActivity extends AppCompatActivity {
 
     private static Vibrator vibrator;
@@ -37,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private PendingIntent playPauseIntent;
 
     private static final String NOTIFICATION_CHANNEL = "flumen_media";
+
+    private static final String AVRCP_PLAYSTATE_CHANGED = "com.android.music.playstatechanged";
+    private static final String AVRCP_META_CHANGED = "com.android.music.metachanged";
 
     private BluetoothReceiver bluetoothReceiver;
 
@@ -217,5 +223,51 @@ public class MainActivity extends AppCompatActivity {
         startService(updateIntent);
 
         //notificationManager.notify(1, mediaNotification);
+    }
+
+    public long md5(String s) {
+        long value = 0;
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // This will overflow the long, since MD5 hashes are 16 bytes and longs are only 4 bytes, but that's okay
+
+            for (int i = 0; i < messageDigest.length; i++)
+            {
+                value += ((long) messageDigest[i] & 0xffL) << (8 * i);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
+    public void updateSongBluetooth(Song song, boolean playing) {
+        Intent i = new Intent(AVRCP_META_CHANGED);
+        i.putExtra("id", md5(song.getFilename()));
+        i.putExtra("artist", song.getArtist());
+        i.putExtra("album", song.getAlbum());
+        i.putExtra("track", song.getName());
+        i.putExtra("playing", playing);
+        i.putExtra("ListSize", 1);
+        i.putExtra("duration", song.getLength());
+        i.putExtra("position", Player.getInstance().getCurrTimeMillis() / 1000f);
+        sendBroadcast(i);
+    }
+
+    public void updateIsPlayingBluetooth(Song song, boolean playing) {
+        Intent i = new Intent(AVRCP_PLAYSTATE_CHANGED);
+        i.putExtra("id", md5(song.getFilename()));
+        i.putExtra("artist", song.getArtist());
+        i.putExtra("album", song.getAlbum());
+        i.putExtra("track", song.getName());
+        i.putExtra("playing", playing);
+        i.putExtra("ListSize", 1);
+        i.putExtra("duration", song.getLength());
+        i.putExtra("position", Player.getInstance().getCurrTimeMillis() / 1000f);
+        sendBroadcast(i);
     }
 }
