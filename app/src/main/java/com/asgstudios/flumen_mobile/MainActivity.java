@@ -25,6 +25,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.renderscript.RenderScript;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         filter.addAction(Intent.ACTION_MEDIA_BUTTON);
+        filter.setPriority(Integer.MAX_VALUE);
         this.registerReceiver(bluetoothReceiver, filter);
     }
 
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().
                         setShowActionsInCompactView(0, 1, 2))
                 .setSubText("")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setVibrate(new long[]{0L});
 

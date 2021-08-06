@@ -247,6 +247,7 @@ public class PlayViewModel extends AndroidViewModel {
             playAdapter.playingIndex = this.playingIndex.getValue();
             playAdapter.notifyDataSetChanged();
         }
+        this.player.setPlaylist(currPlaylist);
     }
 
     public void setPlaylistIndex(int playlistIndex) {
