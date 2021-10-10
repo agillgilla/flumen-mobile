@@ -27,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class SyncWorker implements Runnable {
     private static final String SERVER_IP = "192.168.0.35";
@@ -135,14 +136,16 @@ public class SyncWorker implements Runnable {
                     msg.setData(bundle);
                     statusHandler.dispatchMessage(msg);
 
+                    HashSet<String> playlistSongFilenames = new HashSet<>();
+
                     for (int i = 0; i < songListJsonArray.length(); i++) {
                         JSONObject songFileObj = songListJsonArray.getJSONObject(i);
                         String songFilename = songFileObj.getString("file");
 
+                        playlistSongFilenames.add(songFilename);
+
                         File songFilepath = new File(playlistDir, songFilename);
                         if (!songFilepath.exists()) {
-                            // TODO: PULL SONG
-
                             System.out.println("Pulling song: " + songFilename);
 
                             Uri songGetRequest =  createApiGetRequest(FETCH_SONG_URI, songQueryKeys, new String[] {playlistName, songFilename});
@@ -192,6 +195,27 @@ public class SyncWorker implements Runnable {
 
                         //System.out.println("DURATION: " + songFileObj.getDouble("duration"));
                     }
+
+                    File[] playlistFiles = playlistDir.listFiles();
+                    if (playlistFiles != null) {
+                        for (int i = 0; i < playlistFiles.length; ++i) {
+                            if (playlistFiles[i].isFile()) {
+                                String songFilename = playlistFiles[i].getName();
+
+                                String extension = "";
+                                int periodIndex = songFilename.lastIndexOf('.');
+                                if (periodIndex > 0) {
+                                    extension = songFilename.substring(periodIndex + 1);
+                                }
+
+                                if (extension.equals("mp3") && !playlistSongFilenames.contains(songFilename)) {
+                                    System.out.println("Deleting song: " + songFilename);
+                                    playlistFiles[i].delete();
+                                }
+                            }
+                        }
+                    }
+
 
                     index.put(playlistName, songListJsonArray);
 
