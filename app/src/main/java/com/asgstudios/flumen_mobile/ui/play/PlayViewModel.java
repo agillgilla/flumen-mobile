@@ -63,7 +63,9 @@ public class PlayViewModel extends AndroidViewModel {
         int lastPlaylistIndex = preferences.getLastPlaylistIndex();
 
         this.songs = new MutableLiveData<>();
-        this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(lastPlaylistIndex), true));
+        if (this.playlists.getValue().size() > 0) {
+            this.songs.setValue(playlistManager.getPlaylistSongs(this.playlists.getValue().get(lastPlaylistIndex), true));
+        }
 
         this.playingIndex = new MutableLiveData<>();
         this.playingIndex.setValue(-1);
@@ -84,7 +86,9 @@ public class PlayViewModel extends AndroidViewModel {
         this.currSong.setValue(new Song("", "", "", 0, ""));
 
         this.currPlaylist = new MutableLiveData<>();
-        this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(lastPlaylistIndex));
+        if (playlistManager.loadPlaylistList().size() > 0) {
+            this.currPlaylist.setValue(playlistManager.loadPlaylistList().get(lastPlaylistIndex));
+        }
 
         this.playMode = new MutableLiveData<>();
         this.playMode.setValue(PlayMode.SHUFFLE);
@@ -144,6 +148,10 @@ public class PlayViewModel extends AndroidViewModel {
     }
 
     public void playNewSong(Song song) {
+        if (song == null) {
+            return;
+        }
+        
         this.player.setPlaylist(currPlaylist.getValue());
         boolean isPlaying = this.player.playNewSong(song);
         this.isPlaying.setValue(isPlaying);

@@ -44,13 +44,15 @@ public class PlayShuffleQueue {
             playlistQueueIndices.put(playlist, 0);
         }
 
-        this.setActivePlaylist(playlistManager.getPlaylists().get(0));
+        if (playlistManager.getPlaylists().size() > 0) {
+            this.setActivePlaylist(playlistManager.getPlaylists().get(0));
+        }
     }
 
     public void setActivePlaylist(Playlist playlist) {
         this.activePlaylist = playlist;
 
-        if (playlistQueueShuffleIndices.get(playlist) == null) {
+        if (playlist != null && playlistQueueShuffleIndices.get(playlist) == null) {
             List<Integer> shuffleIndices = new ArrayList<>();
 
             System.out.println("Setting active playlist: " + playlist.getPlaylistName());
@@ -68,6 +70,10 @@ public class PlayShuffleQueue {
     }
 
     public Song nextSong() {
+        if (activePlaylist == null) {
+            return null;
+        }
+
         int currPlaylistIndex = playlistQueueIndices.get(activePlaylist);
 
         List<Integer> playlistShuffleIndices = playlistQueueShuffleIndices.get(activePlaylist);
@@ -104,9 +110,14 @@ public class PlayShuffleQueue {
 
     public int peekNextSongIndex() {
         List<Integer> currPlaylistShuffleIndices = playlistQueueShuffleIndices.get(activePlaylist);
-        int currPlaylistQueueIndex = playlistQueueIndices.get(activePlaylist);
 
-        return currPlaylistShuffleIndices.get(currPlaylistQueueIndex);
+        if (activePlaylist != null) {
+            int currPlaylistQueueIndex = playlistQueueIndices.get(activePlaylist);
+
+            return currPlaylistShuffleIndices.get(currPlaylistQueueIndex);
+        } else {
+            return -1;
+        }
     }
 
     public int peekPreviousSongIndex() {

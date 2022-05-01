@@ -42,6 +42,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull final PlayAdapter.PlayViewHolder holder, final int position) {
+        if (position < 0) {
+            return;
+        }
         final Song song = songs.get(position);
         holder.rowSongTextView.setText(song.getName());
         holder.rowArtistTextView.setText(song.getArtist());

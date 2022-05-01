@@ -145,7 +145,9 @@ public class PlayFragment extends Fragment {
         playViewModel.getCurrPlaylist().observe(getViewLifecycleOwner(), new Observer<Playlist>() {
             @Override
             public void onChanged(Playlist currPlaylist) {
-                playlistSpinner.setSelection(currPlaylist.getPlaylistIndex());
+                if (currPlaylist != null) {
+                    playlistSpinner.setSelection(currPlaylist.getPlaylistIndex());
+                }
             }
         });
 

@@ -179,7 +179,11 @@ public class MainActivity extends AppCompatActivity {
 
         Intent startIntent = new Intent(this, NotificationService.class);
         startIntent.setAction(NotificationService.START_ACTION);
-        startService(startIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(startIntent);
+        } else {
+            startService(startIntent);
+        }
     }
 
     public void updateNotificationPlaying(boolean isPlaying) {
@@ -192,7 +196,11 @@ public class MainActivity extends AppCompatActivity {
         Intent updateIntent = new Intent(this, NotificationService.class);
         updateIntent.setAction(NotificationService.UPDATE_PLAYING_ACTION);
         updateIntent.putExtra("playing", isPlaying);
-        startService(updateIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(updateIntent);
+        } else {
+            startService(updateIntent);
+        }
 
         //notificationManager.notify(1, mediaNotification);
     }
@@ -208,7 +216,11 @@ public class MainActivity extends AppCompatActivity {
         updateIntent.setAction(NotificationService.UPDATE_SONG_ACTION);
         updateIntent.putExtra("name", song.getName());
         updateIntent.putExtra("artist", song.getArtist());
-        startService(updateIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(updateIntent);
+        } else {
+            startService(updateIntent);
+        }
 
         //notificationManager.notify(1, mediaNotification);
     }
@@ -222,7 +234,11 @@ public class MainActivity extends AppCompatActivity {
         Intent updateIntent = new Intent(this, NotificationService.class);
         updateIntent.setAction(NotificationService.UPDATE_PLAYLIST_ACTION);
         updateIntent.putExtra("playlist", playlist.getPlaylistName());
-        startService(updateIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(updateIntent);
+        } else {
+            startService(updateIntent);
+        }
 
         //notificationManager.notify(1, mediaNotification);
     }

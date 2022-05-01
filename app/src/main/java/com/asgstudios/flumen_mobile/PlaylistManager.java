@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,6 +82,10 @@ public class PlaylistManager {
     }
 
     public List<Song> getPlaylistSongs(Playlist playlist, boolean sorted) {
+        if (playlist == null) {
+            return new ArrayList<>();
+        }
+
         try {
             JSONArray playlistArray = indexJson.getJSONArray(playlist.getPlaylistName());
 

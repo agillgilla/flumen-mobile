@@ -185,7 +185,10 @@ public class Player {
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
-        this.preferences.setLastPlaylistIndex(playlist.getPlaylistIndex());
+
+        if (playlist != null) {
+            this.preferences.setLastPlaylistIndex(playlist.getPlaylistIndex());
+        }
     }
 
     public Playlist getPlaylist() {
