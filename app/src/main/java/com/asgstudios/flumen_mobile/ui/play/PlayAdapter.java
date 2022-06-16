@@ -104,6 +104,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.PlayViewHolder
 
     @Override
     public int getItemCount() {
+        if (songs == null) {
+            return 0;
+        }
         return songs.size();
     }
 

@@ -151,7 +151,7 @@ public class PlayViewModel extends AndroidViewModel {
         if (song == null) {
             return;
         }
-        
+
         this.player.setPlaylist(currPlaylist.getValue());
         boolean isPlaying = this.player.playNewSong(song);
         this.isPlaying.setValue(isPlaying);
@@ -179,10 +179,13 @@ public class PlayViewModel extends AndroidViewModel {
                 this.playNewSong(nextSongAndIndex.getSong());
             } else {
                 playAdapter.playingIndex = playShuffleQueue.peekNextSongIndex();
+
                 this.setPlayingIndex(playAdapter.playingIndex);
                 playAdapter.notifyDataSetChanged();
 
-                this.playNewSong(playShuffleQueue.nextSong());
+                if (playAdapter.playingIndex > -1) {
+                    this.playNewSong(playShuffleQueue.nextSong());
+                }
             }
         }
     }

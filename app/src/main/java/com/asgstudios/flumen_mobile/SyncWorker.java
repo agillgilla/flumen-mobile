@@ -196,11 +196,12 @@ public class SyncWorker implements Runnable {
                         //System.out.println("DURATION: " + songFileObj.getDouble("duration"));
                     }
 
+                    // Delete songs that have been removed from playlist
                     File[] playlistFiles = playlistDir.listFiles();
                     if (playlistFiles != null) {
-                        for (int i = 0; i < playlistFiles.length; ++i) {
-                            if (playlistFiles[i].isFile()) {
-                                String songFilename = playlistFiles[i].getName();
+                        for (File playlistFile : playlistFiles) {
+                            if (playlistFile.isFile()) {
+                                String songFilename = playlistFile.getName();
 
                                 String extension = "";
                                 int periodIndex = songFilename.lastIndexOf('.');
@@ -210,16 +211,29 @@ public class SyncWorker implements Runnable {
 
                                 if (extension.equals("mp3") && !playlistSongFilenames.contains(songFilename)) {
                                     System.out.println("Deleting song: " + songFilename);
-                                    playlistFiles[i].delete();
+                                    playlistFile.delete();
                                 }
                             }
                         }
                     }
 
-
                     index.put(playlistName, songListJsonArray);
+                }
 
+                // Delete playlists that have been removed from list
+                File[] playlistDirs = musicDir.listFiles();
+                if (playlistDirs != null) {
+                    for (File playlistDir : playlistDirs) {
+                        if (playlistDir.isDirectory()) {
+                            String playlistDirName = playlistDir.getName();
 
+                            if (!playlistNames.contains(playlistDirName)) {
+                                System.out.println("Deleting playlist: " + playlistDirName);
+                                playlistDir.delete();
+                                index.remove(playlistDirName);
+                            }
+                        }
+                    }
                 }
 
                 File jsonIndexFile = new File(filesDir, JSON_INDEX_FILENAME);

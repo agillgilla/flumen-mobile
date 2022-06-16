@@ -129,38 +129,42 @@ public class NotificationService extends Service {
             notification.flags = Notification.FLAG_ONGOING_EVENT;
 
             startForeground(ONGOING_NOTIFICATION_ID, notification);
-        } else if (intent.getAction().equals(NotificationService.UPDATE_PLAYING_ACTION)) {
-            boolean isPlaying = intent.getBooleanExtra("playing", false);
-            if (isPlaying) {
-                notification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
-            } else {
-                notification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
+        } else if (notification != null) {
+            if (intent.getAction().equals(NotificationService.UPDATE_PLAYING_ACTION)) {
+                boolean isPlaying = intent.getBooleanExtra("playing", false);
+                if (isPlaying) {
+                    notification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
+                } else {
+                    notification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
+                }
+
+                notification.flags = Notification.FLAG_ONGOING_EVENT;
+
+                notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+
+            } else if (intent.getAction().equals(NotificationService.UPDATE_SONG_ACTION)) {
+                String name = intent.getStringExtra("name");
+                String artist = intent.getStringExtra("artist");
+
+                notificationBuilder.setContentTitle(name);
+                notificationBuilder.setContentText(artist);
+                notification = notificationBuilder.build();
+
+                notification.flags = Notification.FLAG_ONGOING_EVENT;
+
+                notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+            } else if (intent.getAction().equals(NotificationService.UPDATE_PLAYLIST_ACTION)) {
+                String playlist = intent.getStringExtra("playlist");
+
+                notificationBuilder.setSubText(playlist);
+                notification = notificationBuilder.build();
+
+                notification.flags = Notification.FLAG_ONGOING_EVENT;
+
+                notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
             }
-
-            notification.flags = Notification.FLAG_ONGOING_EVENT;
-
-            notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
-
-        } else if (intent.getAction().equals(NotificationService.UPDATE_SONG_ACTION)) {
-            String name = intent.getStringExtra("name");
-            String artist = intent.getStringExtra("artist");
-
-            notificationBuilder.setContentTitle(name);
-            notificationBuilder.setContentText(artist);
-            notification = notificationBuilder.build();
-
-            notification.flags = Notification.FLAG_ONGOING_EVENT;
-
-            notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
-        } else if (intent.getAction().equals(NotificationService.UPDATE_PLAYLIST_ACTION)) {
-            String playlist = intent.getStringExtra("playlist");
-
-            notificationBuilder.setSubText(playlist);
-            notification = notificationBuilder.build();
-
-            notification.flags = Notification.FLAG_ONGOING_EVENT;
-
-            notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+        } else {
+            Log.e("ONSTART", "Received command to update notification, but notification was null!");
         }
 
         return Service.START_STICKY;

@@ -111,7 +111,7 @@ public class PlayShuffleQueue {
     public int peekNextSongIndex() {
         List<Integer> currPlaylistShuffleIndices = playlistQueueShuffleIndices.get(activePlaylist);
 
-        if (activePlaylist != null) {
+        if (activePlaylist != null && currPlaylistShuffleIndices.size() > 0) {
             int currPlaylistQueueIndex = playlistQueueIndices.get(activePlaylist);
 
             return currPlaylistShuffleIndices.get(currPlaylistQueueIndex);
