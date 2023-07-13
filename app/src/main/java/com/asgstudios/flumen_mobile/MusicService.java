@@ -201,17 +201,17 @@ public class MusicService extends MediaBrowserServiceCompat {
 
         androidx.core.app.NotificationCompat.Action playPauseAction;
         if (isPlaying) {
-            playPauseAction = new androidx.core.app.NotificationCompat.Action.Builder(android.R.drawable.ic_media_pause, "Pause", playPauseIntent).build();
+            playPauseAction = new androidx.core.app.NotificationCompat.Action.Builder(R.drawable.ic_pause_24dp, "Pause", playPauseIntent).build();
         } else {
-            playPauseAction = new androidx.core.app.NotificationCompat.Action.Builder(android.R.drawable.ic_media_play, "Play", playPauseIntent).build();
+            playPauseAction = new androidx.core.app.NotificationCompat.Action.Builder(R.drawable.ic_play_24dp, "Play", playPauseIntent).build();
         }
 
         Notification notification = new androidx.core.app.NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL)
                 .setStyle(new NotificationCompat.MediaStyle().setMediaSession(mediaSession.getSessionToken()))
                 .setSmallIcon(R.drawable.flumen_transparent)
-                .addAction(android.R.drawable.ic_media_previous, "Previous", prevSongIntent)
+                .addAction(R.drawable.ic_previous_24dp, "Previous", prevSongIntent)
                 .addAction(playPauseAction)
-                .addAction(android.R.drawable.ic_media_next, "Next", nextSongIntent)
+                .addAction(R.drawable.ic_next_24dp, "Next", nextSongIntent)
                 .build();
 
         return notification;
