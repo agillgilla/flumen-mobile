@@ -5,6 +5,8 @@ import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.asgstudios.flumen_mobile.ui.play.PlayViewModel;
 
@@ -29,7 +31,6 @@ public class Player {
 
     private Handler updateTimeHandler;
     private Runnable updateTimeTask;
-
 
     public static Player getOrInstantiate(Application application)
     {

@@ -177,8 +177,16 @@ public class MainActivity extends AppCompatActivity {
 
         //notificationManager.notify(1, mediaNotification);
 
-        Intent startIntent = new Intent(this, NotificationService.class);
-        startIntent.setAction(NotificationService.START_ACTION);
+//        Intent startIntent = new Intent(this, NotificationService.class);
+//        startIntent.setAction(NotificationService.START_ACTION);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(startIntent);
+//        } else {
+//            startService(startIntent);
+//        }
+
+        Intent startIntent = new Intent(this, MusicService.class);
+        //startIntent.setAction(NotificationService.START_ACTION);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(startIntent);
         } else {
@@ -186,61 +194,89 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateNotificationPlaying(boolean isPlaying) {
-        if (isPlaying) {
-            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
-        } else {
-            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
-        }
+    public void updateNotificationPlayingPosition(boolean isPlaying, long position) {
+        Intent updateIntent = new Intent(this, MusicService.class);
+        updateIntent.setAction(MusicService.UPDATE_POSITION_ACTION);
+        updateIntent.putExtra("isPlaying", isPlaying);
+        updateIntent.putExtra("position", position);
 
-        Intent updateIntent = new Intent(this, NotificationService.class);
-        updateIntent.setAction(NotificationService.UPDATE_PLAYING_ACTION);
-        updateIntent.putExtra("playing", isPlaying);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(updateIntent);
         } else {
             startService(updateIntent);
         }
+    }
+
+    public void updateNotificationPlaying(boolean isPlaying) {
+//        if (isPlaying) {
+//            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_pause, "Pause", playPauseIntent);
+//        } else {
+//            mediaNotification.actions[1] = new Notification.Action(android.R.drawable.ic_media_play, "Play", playPauseIntent);
+//        }
+//
+//        Intent updateIntent = new Intent(this, NotificationService.class);
+//        updateIntent.setAction(NotificationService.UPDATE_PLAYING_ACTION);
+//        updateIntent.putExtra("playing", isPlaying);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(updateIntent);
+//        } else {
+//            startService(updateIntent);
+//        }
 
         //notificationManager.notify(1, mediaNotification);
     }
 
     public void updateNotificationSong(Song song) {
-        mediaNotificationBuilder.setContentTitle(song.getName());
-        mediaNotificationBuilder.setContentText(song.getArtist());
-        mediaNotification = mediaNotificationBuilder.build();
+//        mediaNotificationBuilder.setContentTitle(song.getName());
+//        mediaNotificationBuilder.setContentText(song.getArtist());
+//        mediaNotification = mediaNotificationBuilder.build();
+//
+//        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
+//
+//        Intent updateIntent = new Intent(this, NotificationService.class);
+//        updateIntent.setAction(NotificationService.UPDATE_SONG_ACTION);
+//        updateIntent.putExtra("name", song.getName());
+//        updateIntent.putExtra("artist", song.getArtist());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(updateIntent);
+//        } else {
+//            startService(updateIntent);
+//        }
 
-        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
+        //notificationManager.notify(1, mediaNotification);
 
-        Intent updateIntent = new Intent(this, NotificationService.class);
-        updateIntent.setAction(NotificationService.UPDATE_SONG_ACTION);
+        Intent updateIntent = new Intent(this, MusicService.class);
+        updateIntent.setAction(MusicService.UPDATE_SONG_ACTION);
         updateIntent.putExtra("name", song.getName());
         updateIntent.putExtra("artist", song.getArtist());
+        updateIntent.putExtra("album", song.getAlbum());
+        updateIntent.putExtra("duration", song.getLength());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(updateIntent);
         } else {
             startService(updateIntent);
         }
-
-        //notificationManager.notify(1, mediaNotification);
     }
 
     public void updateNotificationPlaylist(Playlist playlist) {
-        mediaNotificationBuilder.setSubText(playlist.getPlaylistName());
-        mediaNotification = mediaNotificationBuilder.build();
-
-        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
-
-        Intent updateIntent = new Intent(this, NotificationService.class);
-        updateIntent.setAction(NotificationService.UPDATE_PLAYLIST_ACTION);
-        updateIntent.putExtra("playlist", playlist.getPlaylistName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(updateIntent);
-        } else {
-            startService(updateIntent);
-        }
+//        mediaNotificationBuilder.setSubText(playlist.getPlaylistName());
+//        mediaNotification = mediaNotificationBuilder.build();
+//
+//        mediaNotification.flags = Notification.FLAG_ONGOING_EVENT;
+//
+//        Intent updateIntent = new Intent(this, NotificationService.class);
+//        updateIntent.setAction(NotificationService.UPDATE_PLAYLIST_ACTION);
+//        updateIntent.putExtra("playlist", playlist.getPlaylistName());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(updateIntent);
+//        } else {
+//            startService(updateIntent);
+//        }
 
         //notificationManager.notify(1, mediaNotification);
+
+
     }
 
     public long md5(String s) {

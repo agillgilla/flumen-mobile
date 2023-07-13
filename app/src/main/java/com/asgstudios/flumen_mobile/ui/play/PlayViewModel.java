@@ -1,9 +1,15 @@
 package com.asgstudios.flumen_mobile.ui.play;
 
 import android.app.Application;
+import android.app.Notification;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+import androidx.media.app.NotificationCompat;
+import androidx.media.session.MediaButtonReceiver;
 
 import com.asgstudios.flumen_mobile.PlayQueue;
 import com.asgstudios.flumen_mobile.PlayShuffleQueue;
@@ -11,6 +17,7 @@ import com.asgstudios.flumen_mobile.PlaybackInfo;
 import com.asgstudios.flumen_mobile.Playlist;
 import com.asgstudios.flumen_mobile.PlaylistManager;
 import com.asgstudios.flumen_mobile.Preferences;
+import com.asgstudios.flumen_mobile.R;
 import com.asgstudios.flumen_mobile.Song;
 import com.asgstudios.flumen_mobile.Player;
 import com.asgstudios.flumen_mobile.SongAndIndex;

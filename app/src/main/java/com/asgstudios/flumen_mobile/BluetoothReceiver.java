@@ -22,20 +22,20 @@ public class BluetoothReceiver extends BroadcastReceiver {
         } else if (Intent.ACTION_MEDIA_BUTTON.equals(action)) {
             final KeyEvent event = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             if (event.getAction() == KeyEvent.ACTION_DOWN || event.getAction() == KeyEvent.ACTION_UP) {
-                switch (event.getKeyCode()) {
-                    case KeyEvent.KEYCODE_MEDIA_STOP:
-                        // stop music
-                        break;
-                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                        playPause();
-                        break;
-                    case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        next();
-                        break;
-                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        previous();
-                        break;
-                }
+//                switch (event.getKeyCode()) {
+//                    case KeyEvent.KEYCODE_MEDIA_STOP:
+//                        // stop music
+//                        break;
+//                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+//                        playPause();
+//                        break;
+//                    case KeyEvent.KEYCODE_MEDIA_NEXT:
+//                        next();
+//                        break;
+//                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+//                        previous();
+//                        break;
+//                }
             }
         }
     }

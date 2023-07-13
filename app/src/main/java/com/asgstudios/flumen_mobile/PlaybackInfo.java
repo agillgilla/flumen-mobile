@@ -14,6 +14,10 @@ public class PlaybackInfo {
         this(0, currSongDuration);
     }
 
+    /**
+     * Get the song playback position (in milliseconds)
+     * @return The song position in milliseconds
+     */
     public long getCurrSongTime() {
         return currSongTime;
     }
@@ -22,6 +26,10 @@ public class PlaybackInfo {
         this.currSongTime = currSongTime;
     }
 
+    /**
+     * Get the song duration (in milliseconds)
+     * @return The song duration in milliseconds
+     */
     public long getCurrSongDuration() {
         return currSongDuration;
     }

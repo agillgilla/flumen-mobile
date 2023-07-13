@@ -76,10 +76,19 @@ public class PlayFragment extends Fragment {
         final SeekBar seekBar = rootView.findViewById(R.id.seekBar);
 
         playViewModel.getCurrSongPlaybackInfo().observe(getViewLifecycleOwner(), new Observer<PlaybackInfo>() {
+            long lastPlaybackPosition = 0;
+
             @Override
             public void onChanged(PlaybackInfo currSongPlaybackInfo) {
                 seekBar.setMax((int) (currSongPlaybackInfo.getCurrSongDuration() / 100.0f));
                 seekBar.setProgress((int) (currSongPlaybackInfo.getCurrSongTime() / 100.0f));
+
+                long playBackPositionSeconds = (long) (currSongPlaybackInfo.getCurrSongTime() / 1000.0f);
+
+                if (playBackPositionSeconds != lastPlaybackPosition) {
+                    mainActivity.updateNotificationPlayingPosition(playViewModel.getIsPlaying().getValue(), playBackPositionSeconds);
+                    lastPlaybackPosition = playBackPositionSeconds;
+                }
             }
         });
 
@@ -179,7 +188,7 @@ public class PlayFragment extends Fragment {
 
                 playViewModel.playPause();
 
-                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+                mainActivity.updateNotificationPlayingPosition(playViewModel.getIsPlaying().getValue(), (long) (playViewModel.getCurrSongPlaybackInfo().getValue().getCurrSongTime() / 1000.0f));
 
                 mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
@@ -193,7 +202,7 @@ public class PlayFragment extends Fragment {
 
                 playViewModel.nextSong();
 
-                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+                mainActivity.updateNotificationPlayingPosition(playViewModel.getIsPlaying().getValue(), (long) (playViewModel.getCurrSongPlaybackInfo().getValue().getCurrSongTime() / 1000.0f));
 
                 mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
@@ -207,7 +216,7 @@ public class PlayFragment extends Fragment {
 
                 playViewModel.previousSong();
 
-                mainActivity.updateNotificationPlaying(playViewModel.getIsPlaying().getValue());
+                mainActivity.updateNotificationPlayingPosition(playViewModel.getIsPlaying().getValue(), (long) (playViewModel.getCurrSongPlaybackInfo().getValue().getCurrSongTime() / 1000.0f));
 
                 mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
@@ -253,7 +262,7 @@ public class PlayFragment extends Fragment {
                 } else {
                     playButton.setImageResource(R.drawable.ic_play_24dp);
                 }
-                mainActivity.updateNotificationPlaying(isPlaying);
+                mainActivity.updateNotificationPlayingPosition(playViewModel.getIsPlaying().getValue(), (long) (playViewModel.getCurrSongPlaybackInfo().getValue().getCurrSongTime() / 1000.0f));
 
                 mainActivity.updateIsPlayingBluetooth(playViewModel.getCurrSong().getValue(), playViewModel.getIsPlaying().getValue());
             }
@@ -262,6 +271,9 @@ public class PlayFragment extends Fragment {
 
         recyclerView = rootView.findViewById(R.id.playView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
+        playAdapter = new PlayAdapter(playViewModel, rootView.getContext(), new ArrayList<Song>(), -1);
+        playViewModel.setPlayAdapter(playAdapter);
 
         playViewModel.getSongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
             @Override
