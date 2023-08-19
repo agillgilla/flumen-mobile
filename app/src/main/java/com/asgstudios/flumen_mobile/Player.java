@@ -176,6 +176,13 @@ public class Player {
         updateTimeHandler.postDelayed(updateTimeTask, 100);
     }
 
+    public void seekTo(int seconds) {
+        mediaPlayer.seekTo(seconds * 1000);
+
+        // update timer progress again
+        updateTimeHandler.postDelayed(updateTimeTask, 100);
+    }
+
     public boolean isPlaying() {
         return this.mediaPlayer.isPlaying();
     }

@@ -70,7 +70,10 @@ public class MusicService extends MediaBrowserServiceCompat {
         public void onSeekTo(long pos) {
             super.onSeekTo(pos);
 
-            System.out.printf("onSeekTo %d\n", pos);
+            PlayViewModel playViewModel = getPlayerViewModel();
+            if (playViewModel != null) {
+                playViewModel.seekTo((int) pos);
+            }
         }
 
         @Override
@@ -115,6 +118,7 @@ public class MusicService extends MediaBrowserServiceCompat {
                 PlaybackStateCompat.ACTION_PLAY_PAUSE |
                         PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
                         PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH |
+                        PlaybackStateCompat.ACTION_SEEK_TO |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                         PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
         if (getIsPlaying()) {

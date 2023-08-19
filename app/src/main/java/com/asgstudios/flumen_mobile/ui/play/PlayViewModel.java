@@ -172,6 +172,10 @@ public class PlayViewModel extends AndroidViewModel {
         player.finalizeSeek(progress);
     }
 
+    public void seekTo(int seconds) {
+        player.seekTo(seconds);
+    }
+
     public void nextSong() {
         if (this.getPlayMode().getValue() == PlayMode.LOOP) {
             this.player.restartSong();
