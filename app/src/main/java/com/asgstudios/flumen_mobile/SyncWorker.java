@@ -26,11 +26,14 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.security.MessageDigest;
 
 public class SyncWorker implements Runnable {
-    private static final String SERVER_IP = "192.168.0.35";
+    //private static final String SERVER_IP = "192.168.0.35";
+    private static final String SERVER_IP = "192.168.0.13";
     private static final String API_URI = "api";
     private static final String FETCH_PLAYLISTS_URI = "fetchPlaylists";
     private static final String SONGS_LIST_URI = "songsList";
@@ -66,6 +69,15 @@ public class SyncWorker implements Runnable {
             System.out.println("IO Exception when reading input stream: " + ioe.getMessage());
             return null;
         }
+    }
+
+    public static String byteArrayToHexString(byte[] b) {
+        String result = "";
+
+        for (int i = 0; i < b.length; i++) {
+            result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        }
+        return result;
     }
 
     private static Uri createApiGetRequest(String endPointFunction, String[] queryKeys, String[] queryVals) {
@@ -145,7 +157,7 @@ public class SyncWorker implements Runnable {
                         playlistSongFilenames.add(songFilename);
 
                         File songFilepath = new File(playlistDir, songFilename);
-                        if (!songFilepath.exists()) {
+                        while (!songFilepath.exists()) {
                             System.out.println("Pulling song: " + songFilename);
 
                             Uri songGetRequest =  createApiGetRequest(FETCH_SONG_URI, songQueryKeys, new String[] {playlistName, songFilename});
@@ -153,16 +165,38 @@ public class SyncWorker implements Runnable {
                             urlConnection = (HttpURLConnection) songUrl.openConnection();
 
                             InputStream songInputStream = new BufferedInputStream(urlConnection.getInputStream());
-
                             OutputStream songOutputStream = new FileOutputStream(songFilepath);
+
+                            MessageDigest digest = null;
+                            try {
+                                digest = MessageDigest.getInstance("MD5");
+                            } catch (NoSuchAlgorithmException e) {
+                                System.out.println("MD5 algorithm missing. Ignoring hash. Error: " + e.getMessage());
+                            }
 
                             byte[] buf = new byte[8192];
                             int length;
                             while ((length = songInputStream.read(buf)) > 0) {
                                 songOutputStream.write(buf, 0, length);
+
+                                if (digest != null) {
+                                    digest.update(buf, 0, length);
+                                }
                             }
                             songInputStream.close();
                             songOutputStream.close();
+
+                            if (digest != null) {
+                                String computedHash = byteArrayToHexString(digest.digest());
+                                String receivedHash = songFileObj.getString("hash");
+
+                                if (computedHash.equals(receivedHash)) {
+                                    System.out.println("Hashes match!");
+                                    break;
+                                } else {
+                                    System.out.printf("Received hash %s doesn't match computed hash %s%n", receivedHash, computedHash);
+                                }
+                            }
                         }
 
                         Message progressMsg = statusHandler.obtainMessage();
@@ -218,6 +252,8 @@ public class SyncWorker implements Runnable {
                     }
 
                     index.put(playlistName, songListJsonArray);
+
+                    System.out.println("Putting: " + playlistName);
                 }
 
                 // Delete playlists that have been removed from list
@@ -226,9 +262,16 @@ public class SyncWorker implements Runnable {
                     for (File playlistDir : playlistDirs) {
                         if (playlistDir.isDirectory()) {
                             String playlistDirName = playlistDir.getName();
+                            System.out.println("Checking playlist: " + playlistDirName);
 
                             if (!playlistNames.contains(playlistDirName)) {
                                 System.out.println("Deleting playlist: " + playlistDirName);
+
+                                for (File file : playlistDir.listFiles()) {
+                                    System.out.println("Found file to delete: " + file.getName());
+                                    file.delete();
+                                }
+                                
                                 playlistDir.delete();
                                 index.remove(playlistDirName);
                             }
